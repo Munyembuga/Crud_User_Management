@@ -43,6 +43,7 @@
                         New User</a>
                 </div>
                 <br>
+                <c:if test="${not empty searchResults}">
                 <table class="table table-bordered">
                     <thead>
                         <tr>
@@ -72,6 +73,7 @@
                     </tbody>
 
                 </table>
+                    </c:if>
             </div>
         </div>
     </body>

@@ -1,5 +1,5 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-         pageEncoding="UTF-8"%>
+<%--<%@ page language="java" contentType="text/html; charset=UTF-8"
+         pageEncoding="UTF-8"%>--%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <html>
     <head>
@@ -10,21 +10,9 @@
               crossorigin="anonymous">
     </head>
     <body>
+        <%@include file="navBar.jsp" %>
 
-        <header>
-            <nav class="navbar navbar-expand-md navbar-dark"
-                 style="background-color: tomato">
-                <div>
-                    <a href="https://www.javaguides.net" class="navbar-brand"> User
-                        Management App </a>
-                </div>
-
-                <ul class="navbar-nav">
-                    <li><a href="<%=request.getContextPath()%>/list"
-                           class="nav-link">Users</a></li>
-                </ul>
-            </nav>
-        </header>
+  
         <br>
 
         <div class="row">
@@ -34,7 +22,7 @@
                 <h3 class="text-center">List of Users</h3>
                 <hr>
                 <form action="<%=request.getContextPath()%>/search" method="GET">
-    <input type="text" name="id" placeholder="Search by Name">
+    <input type="text" name="name" placeholder="Search by Name">
     <button type="submit">Search</button>
 </form>
                 <div class="container text-left">
@@ -47,14 +35,14 @@
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Namee</th>
+                            <th>Name</th>
                             <th>Email</th>
                             <th>Country</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-
+                     
                         <c:forEach var="user" items="${searchResults}">
 
                             <tr>

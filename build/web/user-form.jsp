@@ -57,7 +57,7 @@
 				</fieldset>
 
 				<fieldset class="form-group">
-					<label>Usersss Email</label> <input type="text"
+					<label>Users Email</label> <input type="text"
 						value="<c:out value='${user.email}' />" class="form-control"
 						name="email">
 				</fieldset>

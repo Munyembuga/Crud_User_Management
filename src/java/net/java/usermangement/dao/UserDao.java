@@ -13,6 +13,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import net.java.usermanagement.model.SignUp;
 
 public class UserDao {
 
@@ -24,8 +25,9 @@ public class UserDao {
     private static final String SELECT_ALL_USER = "SELECT * FROM users";
     private static final String DELETE_USER_ID = "delete from users where id = ?;";
     private static final String UPDATE_USER_BYID = "update users set name=?, email=?,country =? where id= ?;";
-    private static final String SELECT_ALL_USERBYNAME = "select id,name,email,country  from users where name=?;";
-
+    private static final String SELECT_ALL_USERBYNAME = "select id,name,email,country  from users where name= ?;";
+    private static final String SIGNUP ="INSERT INTO signup" + " (username,email,phone,password) VALUES " + " (?,?,?,?);";
+    private static final String SELECT_LOGIN= "select *  from signup where email= ? AND password=? ;";
     protected Connection getConnection() {
 
         Connection con = null;
@@ -61,6 +63,23 @@ public class UserDao {
         }
 
     }
+    
+    public void signup(SignUp signup) {
+
+        try (Connection Conn = getConnection(); PreparedStatement psa = Conn.prepareStatement(SIGNUP);) {
+
+            psa.setString(1, signup.getName());
+            psa.setString(2, signup.getEmail());
+            psa.setString(3, signup.getPhone());
+            psa.setString(4, signup.getPassword());
+            psa.executeUpdate();
+            System.out.println(" row(s) inserted.");
+        } catch (Exception e) {
+            e.printStackTrace();
+
+        }
+
+    }
 
     public int update(Users users) {
         int rowupadate = 0;
@@ -82,11 +101,10 @@ public class UserDao {
 
     }
 
-    public Users  seclectUser(int id) {
-      Users user = null;
+    public Users seclectUser(int id) {
+        Users user = null;
 
-        try (Connection Conn = getConnection(); 
-                PreparedStatement psa = Conn.prepareStatement(SELECT_ALL_USERBYID);) {
+        try (Connection Conn = getConnection(); PreparedStatement psa = Conn.prepareStatement(SELECT_ALL_USERBYID);) {
 
             psa.setInt(1, id);
             System.out.println(psa);
@@ -105,18 +123,43 @@ public class UserDao {
         return user;
 
     }
-    
-    public  List<Users>  seclectUserByname(int id) {
-       List<Users> user = new ArrayList<>();
+    public SignUp login(String email,String passw) {
+     SignUp signup = null;
 
-        try (Connection Conn = getConnection(); 
-                PreparedStatement psa = Conn.prepareStatement(SELECT_ALL_USERBYID);) {
-
-            psa.setInt(1, id);
+        try (Connection Conn = getConnection(); PreparedStatement psa = Conn.prepareStatement(SELECT_LOGIN);) {
+           
+            psa.setString(1, email);
+            psa.setString(2, passw);
             System.out.println(psa);
             ResultSet rs = psa.executeQuery();
             while (rs.next()) {
-                String name = rs.getString("name");
+              
+                 String name = rs.getString("username");
+                String emails = rs.getString("email");
+                String phone = rs.getString("phone");
+                signup =  new SignUp(name, emails, phone);
+//                signup = new SignUp( name, email, phone);
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+
+        }
+        return signup;
+
+    }
+    
+    public List<Users> seclectUserByname(String name) {
+        List<Users> user = new ArrayList<>();
+
+        try (Connection Conn = getConnection(); PreparedStatement psa = Conn.prepareStatement(SELECT_ALL_USERBYNAME);) {
+
+            psa.setString(1, name);
+            System.out.println(psa);
+            ResultSet rs = psa.executeQuery();
+            while (rs.next()) {
+                int id = rs.getInt("id");
+
                 String email = rs.getString("email");
                 String country = rs.getString("country");
                 user.add(new Users(id, name, email, country));
@@ -130,17 +173,14 @@ public class UserDao {
 
     }
     
-    
 
     public List<Users> seclectAllUser() {
         List<Users> user = new ArrayList<>();
 
-        try (Connection Conn = getConnection();
-                PreparedStatement psa = Conn.prepareStatement(SELECT_ALL_USER);
-                 ) {
+        try (Connection Conn = getConnection(); PreparedStatement psa = Conn.prepareStatement(SELECT_ALL_USER);) {
 
             System.out.println(psa);
-           ResultSet rs = psa.executeQuery();
+            ResultSet rs = psa.executeQuery();
             while (rs.next()) {
                 int id = rs.getInt("id");
                 String name = rs.getString("name");
@@ -149,7 +189,7 @@ public class UserDao {
                 user.add(new Users(id, name, email, country));
 
             }
-        } catch (SQLException  e) {
+        } catch (SQLException e) {
             e.printStackTrace();
 
         }
@@ -169,6 +209,47 @@ public class UserDao {
             e.printStackTrace();
         }
         return rowupadate;
+    }
+
+    public List<Users> selectUsersWithPagination(int offset, int recordsPerPage) {
+        List<Users> users = new ArrayList<>();
+        String SELECT_USERS_WITH_PAGINATION = "SELECT * FROM users LIMIT ?, ?;";
+
+        try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(SELECT_USERS_WITH_PAGINATION)) {
+
+            preparedStatement.setInt(1, offset);
+            preparedStatement.setInt(2, recordsPerPage);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                String name = resultSet.getString("name");
+                String email = resultSet.getString("email");
+                String country = resultSet.getString("country");
+                users.add(new Users(id, name, email, country));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return users;
+    }
+
+    public int getTotalRecords() {
+        int totalRecords = 0;
+        String COUNT_TOTAL_RECORDS = "SELECT COUNT(*) FROM users;";
+
+        try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(COUNT_TOTAL_RECORDS); ResultSet resultSet = preparedStatement.executeQuery()) {
+
+            if (resultSet.next()) {
+                totalRecords = resultSet.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return totalRecords;
     }
 
     private void printSQLException(SQLException ex) {
