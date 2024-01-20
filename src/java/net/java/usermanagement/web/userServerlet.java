@@ -166,6 +166,11 @@ public class userServerlet extends HttpServlet {
         RequestDispatcher dispatcher = request.getRequestDispatcher("Login-form.jsp");
         dispatcher.forward(request, response);
     }
+    private void dashboard(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        RequestDispatcher dispatcher = request.getRequestDispatcher("Dashboard.jsp");
+        dispatcher.forward(request, response);
+    }
 
     private void signupForm(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

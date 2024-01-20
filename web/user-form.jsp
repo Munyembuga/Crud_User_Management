@@ -52,7 +52,7 @@
 
 				<fieldset class="form-group">
 					<label>User Name</label> <input type="text"
-						value="<c:out value='${user.name}' />" class="form-control"
+						value="<c:out value='${user.name}'/>" class="form-control"
 						name="name" required="required">
 				</fieldset>
 
